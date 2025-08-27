@@ -2,14 +2,17 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { works } from "@/data/works"
 
-type Props = { params: { slug: string } }
-
 export function generateStaticParams() {
   return works.map((w) => ({ slug: w.slug }))
 }
 
-export function generateMetadata({ params }: Props) {
-  const work = works.find((w) => w.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const work = works.find((w) => w.slug === slug)
   return {
     title: work ? work.title : "Œuvre",
     description: work?.description ?? "Œuvre — Hemy Art",
@@ -21,8 +24,13 @@ export function generateMetadata({ params }: Props) {
   }
 }
 
-export default function WorkDetailPage({ params }: Props) {
-  const work = works.find((w) => w.slug === params.slug)
+export default async function WorkDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const work = works.find((w) => w.slug === slug)
   if (!work) return notFound()
 
   return (

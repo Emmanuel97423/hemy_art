@@ -2,22 +2,30 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { projects } from "@/data/projects"
 
-type Props = { params: { slug: string } }
-
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }))
 }
 
-export function generateMetadata({ params }: Props) {
-  const project = projects.find((p) => p.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const project = projects.find((p) => p.slug === slug)
   const title = project?.title ?? "Projet"
   const description = project?.description ?? "Projet — Hemy Art"
   const images = project?.image ? [{ url: project.image }] : []
   return { title, description, openGraph: { title, description, images } }
 }
 
-export default function ProjectDetailPage({ params }: Props) {
-  const project = projects.find((p) => p.slug === params.slug)
+export default async function ProjectDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const project = projects.find((p) => p.slug === slug)
   if (!project) return notFound()
 
   return (
