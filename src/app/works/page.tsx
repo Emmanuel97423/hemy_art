@@ -1,15 +1,19 @@
+// src/app/works/page.tsx
 import { works } from "@/data/works"
 import { WorkCard } from "@/components/work-card"
 import { TagFilter } from "@/components/tag-filter"
 
-type Props = {
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
+type SearchParams = Promise<Record<string, string | string[] | undefined>>
 
 export const metadata = { title: "Œuvres" }
 
-export default function WorksPage({ searchParams }: Props) {
-  const selected = normalize(searchParams?.tag) // string | string[] → string[]
+export default async function WorksPage({
+  searchParams,
+}: {
+  searchParams?: SearchParams
+}) {
+  const sp = (await searchParams) ?? {}
+  const selected = normalize(sp.tag) // string | string[] | undefined -> string[]
   const allTags = getAllTags()
   const filtered = selected.length
     ? works.filter((w) => w.tags?.some((t) => selected.includes(t)))
